@@ -25,8 +25,7 @@ FileHub is a modern, secure file storage and sharing platform with AI-powered as
 [View Demo](https://filehub.vercel.app)
 
 ## Environment Variables
-- `GEMINI_API_KEY`: Your Google Gemini AI API key
-
+- `GEMINI_API_KEY`: AIzaSyA2JbmQsS02L-rDAPpANQEu_Cw9cExEAY4
 ## Deployment
 This project is deployed on Vercel.
 

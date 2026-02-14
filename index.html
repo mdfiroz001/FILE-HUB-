@@ -8,12 +8,12 @@
     <meta name="keywords" content="file storage, secure downloads, premium resources, cloud sharing, file manager">
     <meta name="author" content="FileHub Team">
     <meta property="og:type" content="website">
-    <meta property="og:url" content="https://file-hubs.vercel.app/">
+    <meta property="og:url" content="https://file-hub.vercel.app/">
     <meta property="og:title" content="FileHub Premium - Secure Storage & Sharing">
     <meta property="og:description" content="Access and manage your premium files with FileHub. Fast, secure, and powered by AI.">
     <meta property="og:image" content="https://iili.io/fY4mez7.jpg">
     <meta property="twitter:card" content="summary_large_image">
-    <meta property="twitter:url" content="https://file-hubs.vercel.app/">
+    <meta property="twitter:url" content="https://file-hub.vercel.app/">
     <meta property="twitter:title" content="FileHub Premium">
     <meta property="twitter:description" content="The ultimate platform for secure file management and premium downloads.">
     <meta property="twitter:image" content="https://iili.io/fY4mez7.jpg">
@@ -24,7 +24,7 @@
     <link rel="icon" type="image/png" href="https://iili.io/fY4mez7.jpg">
     <link rel="apple-touch-icon" href="https://iili.io/fY4mez7.jpg">
     <link rel="manifest" href="/manifest.json">
-    <title>FileHub - Secure File Sharing with AI</title>
+    <title>FileHub - Secure File Sharing</title>
     
     <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
@@ -1397,11 +1397,11 @@
     </div>
 </div>
 
-<!-- AI Assistant Sheet - Google Gemini AI Powered -->
+<!-- AI Assistant Sheet -->
 <div class="bottom-sheet" id="aiSheet">
     <div class="sheet-header">
         <button class="sheet-btn sheet-left-btn" id="aiExpandBtn"></button>
-        <span class="sheet-title">AI Assistant</span>
+        <span class="sheet-title">Assistant</span>
         <button class="sheet-btn" id="closeAiSheet">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
         </button>
@@ -1409,11 +1409,11 @@
     <div class="chat-container" id="chatList">
         <div class="chat-bubble ai">
             <img src="https://iili.io/fYWPWg9.jpg" class="ai-avatar" id="aiAvatar" onerror="this.onerror=null;this.src='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII='">
-            <div class="ai-content">Hello! I'm your FileHub assistant powered by **Google Gemini AI**. How can I help you today? You can ask me about files, uploads, downloads, or anything about FileHub!</div>
+            <div class="ai-content">Hello! I'm your FileHub assistant. How can I help you today?</div>
         </div>
     </div>
     <div class="chat-footer">
-        <textarea id="chatInput" class="chat-input" placeholder="Ask me anything..." rows="1"></textarea>
+        <textarea id="chatInput" class="chat-input" placeholder="Type your message..." rows="1"></textarea>
         <button id="chatSendBtn" class="chat-send-btn">
             <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"></path></svg>
         </button>
@@ -1474,9 +1474,6 @@
     const adminsRef = database.ref('admins');
 
     // Constants
-    const GEMINI_API_KEY = "AIzaSyAZP5LxDGJl7I89-tM5fudeNWvLA4DWX8Y";
-    const GEMINI_API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent";
-    
     const HEAD_AI_LIGHT = "https://iili.io/fYWPezx.jpg";
     const HEAD_AI_DARK = "https://iili.io/fYWPEs2.jpg";
     const CHAT_AI_LIGHT = "https://iili.io/fYWPWg9.jpg";
@@ -1542,6 +1539,22 @@
     let notifListener = null;
     let chatHistory = [];
     let isAdmin = false;
+
+    // AI Response Templates
+    const aiResponses = [
+        "I can help you find files, check your uploads, or answer questions about FileHub.",
+        "You can upload files from the upload page. Make sure to provide accurate information.",
+        "Your files will be reviewed by admin before they become public.",
+        "The AI assistant is here to help you with any questions about FileHub.",
+        "Check your profile to see your uploads and statistics.",
+        "Need help with something specific? Just ask!",
+        "You can search for files using the search bar at the top.",
+        "Notifications about your files and updates will appear here.",
+        "To download a file, click on it and follow the instructions. Some files may require watching ads first.",
+        "Your profile shows your ID, join date, and upload statistics.",
+        "You can change your profile picture and update your information.",
+        "If you have any issues, please contact support or ask the admin."
+    ];
 
     // Helper Functions
     function formatCount(n) {
@@ -1704,7 +1717,7 @@
             // Load notifications
             loadNotifications();
             
-            // Load chat history from Firebase
+            // Load chat history
             loadChatHistory();
             
             // Update UI
@@ -1746,7 +1759,7 @@
                 <div class="auth-header">
                     <img src="https://iili.io/fY4mez7.jpg" class="auth-logo" onerror="this.src='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII='">
                     <h1 class="auth-title">Welcome to FileHub</h1>
-                    <p class="auth-subtitle">Secure file storage & sharing platform with AI Assistant</p>
+                    <p class="auth-subtitle">Secure file storage & sharing platform</p>
                 </div>
                 
                 <div class="auth-tabs" id="authTabs">
@@ -2145,53 +2158,6 @@
         }
     });
 
-    // Google Gemini AI API call function
-    async function getGeminiResponse(prompt) {
-        try {
-            const response = await fetch(`${GEMINI_API_URL}?key=${GEMINI_API_KEY}`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    contents: [{
-                        parts: [{
-                            text: `You are a helpful AI assistant for FileHub, a file storage and sharing platform. 
-                            Users can upload files, download resources, and manage their account. 
-                            Keep responses friendly, concise, and helpful. 
-                            If asked about features, explain how to upload, download, and use the platform.
-                            
-                            User: ${prompt}
-                            
-                            Assistant:`
-                        }]
-                    }],
-                    generationConfig: {
-                        temperature: 0.7,
-                        maxOutputTokens: 500,
-                    }
-                })
-            });
-
-            if (!response.ok) {
-                const errorData = await response.json();
-                console.error('Gemini API Error:', errorData);
-                throw new Error(errorData.error?.message || 'Failed to get AI response');
-            }
-
-            const data = await response.json();
-            
-            if (data.candidates && data.candidates[0]?.content?.parts[0]?.text) {
-                return data.candidates[0].content.parts[0].text;
-            } else {
-                throw new Error('Invalid response from Gemini API');
-            }
-        } catch (error) {
-            console.error('Gemini API call failed:', error);
-            throw error;
-        }
-    }
-
     async function sendMessage() {
         const text = chatInput.value.trim();
         if(!text) return;
@@ -2203,7 +2169,7 @@
         showTypingIndicator();
         
         try {
-            // Save user message to Firebase
+            // Save user message
             if (currentUser) {
                 await chatsRef.push({
                     userId: currentUser.uid,
@@ -2213,35 +2179,46 @@
                 });
             }
             
-            // Get response from Google Gemini AI
-            let response;
-            try {
-                response = await getGeminiResponse(text);
-            } catch (apiError) {
-                console.error('Gemini API error:', apiError);
-                // Fallback responses if Gemini API fails
-                const fallbackResponses = [
-                    "I'm here to help with FileHub! You can upload files, browse resources, and manage your profile. What would you like to know?",
-                    "FileHub allows you to securely store and share files. Visit the upload page to add new files, or browse the home page for resources.",
-                    "Need help with a specific feature? I can assist with uploads, downloads, account settings, and more!",
-                    "Your profile shows your upload statistics and account information. You can edit your profile from there.",
-                    "To download a file, click on it and follow the instructions. Some files may require watching ads first."
-                ];
-                response = fallbackResponses[Math.floor(Math.random() * fallbackResponses.length)];
-            }
-            
-            removeTypingIndicator();
-            appendMessage('ai', response);
-            
-            // Save AI response to Firebase
-            if (currentUser) {
-                await chatsRef.push({
-                    userId: currentUser.uid,
-                    role: 'ai',
-                    content: response,
-                    timestamp: Date.now()
-                });
-            }
+            // Generate AI response
+            setTimeout(async () => {
+                removeTypingIndicator();
+                
+                let response = "";
+                
+                if (text.toLowerCase().includes('hello') || text.toLowerCase().includes('hi') || text.toLowerCase().includes('hey')) {
+                    response = "Hello! How can I assist you with FileHub today?";
+                } else if (text.toLowerCase().includes('upload')) {
+                    response = "To upload files, click the upload button at the bottom. Fill in the title, description, and URLs. Your file will be reviewed by admin before going public.";
+                } else if (text.toLowerCase().includes('download')) {
+                    response = "Click on any file card to view details. If ads are required, watch them to unlock the download link. Free files can be downloaded directly.";
+                } else if (text.toLowerCase().includes('profile')) {
+                    response = "Your profile shows your statistics, uploaded files, and account info. You can edit your profile and change settings there.";
+                } else if (text.toLowerCase().includes('notification')) {
+                    response = "Notifications keep you updated about your files, approvals, and system announcements. Click the bell icon to view them.";
+                } else if (text.toLowerCase().includes('admin')) {
+                    response = "Admin users have special privileges to manage files, banners, and send notifications to all users.";
+                } else if (text.toLowerCase().includes('balance') || text.toLowerCase().includes('earning')) {
+                    response = "Your balance is shown in your profile. You earn from file downloads and other activities on the platform.";
+                } else if (text.toLowerCase().includes('file') || text.toLowerCase().includes('resource')) {
+                    response = "Browse files on the home page. Use the search bar to find specific resources. Each file has details and download options.";
+                } else if (text.toLowerCase().includes('help')) {
+                    response = "I can help with: uploads, downloads, profile management, notifications, files, and more. Just ask a specific question!";
+                } else {
+                    response = aiResponses[Math.floor(Math.random() * aiResponses.length)];
+                }
+                
+                appendMessage('ai', response);
+                
+                // Save AI response
+                if (currentUser) {
+                    await chatsRef.push({
+                        userId: currentUser.uid,
+                        role: 'ai',
+                        content: response,
+                        timestamp: Date.now()
+                    });
+                }
+            }, 1500);
             
         } catch (e) {
             removeTypingIndicator();
